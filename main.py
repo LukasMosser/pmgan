@@ -16,9 +16,12 @@ from dataset import HDF5Dataset, save_hdf5
 import dcgan
 import numpy as np
 np.random.seed(43)
+from multiprocessing import Pool
+from dask_pipeline import run_analysis_pipeline
+
 
 #Change workdir to where you want the files output
-work_dir = os.path.expandvars('./')
+work_dir = os.path.expandvars('$PBS_O_WORKDIR/berea_test')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', required=True, help='3D')
@@ -186,13 +189,27 @@ for epoch in range(opt.niter):
         f.write('\n')
         f.close()
         
-    if epoch % 5 == 0:
+    if epoch % 1 == 0:
         fake = netG(fixed_noise)
         fake_TI = netG(fixed_noise_TI)
-        save_hdf5(fake.data, work_dir+'fake_samples_{0}.hdf5'.format(gen_iterations))
-        save_hdf5(fake_TI.data, work_dir+'fake_TI_{0}.hdf5'.format(gen_iterations))
+
+        save_hdf5(fake.data, os.path.join(work_dir, 'fake_samples_{0}.hdf5'.format(gen_iterations)))
+        save_hdf5(fake_TI.data, os.path.join(work_dir, 'fake_TI_{0}.hdf5'.format(gen_iterations)))
+
+
+        fdir = os.path.join(work_dir, "epoch_"+str(epoch))
+
+        os.mkdir(fdir)
+
+        for i in range(10):
+            fixed_noise.data.normal_(0, 1)
+            fake = netG(fixed_noise)
+            save_hdf5(fake.data, os.path.join(fdir, 'fake_samples_{0}.hdf5'.format(i)))
+
+        pool = Pool(processes=1)
+        result = pool.apply_async(run_analysis_pipeline, fdir)
 
     # do checkpointing
-    if epoch % 5 == 0:
+    if epoch % 1 == 0:
         torch.save(netG.state_dict(), work_dir+'netG_epoch_%d.pth' % (epoch))
         torch.save(netD.state_dict(), work_dir+'netD_epoch_%d.pth' % (epoch))
