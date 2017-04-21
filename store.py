@@ -24,7 +24,7 @@ def straight_line_at_origin(porosity):
     return func
 
 
-def to_json():
+def to_json(porosities):
     pass
 
 
@@ -125,3 +125,27 @@ def plot_directional_s2(dir, directional_averages, directional_std, directional_
         ax_handle.grid()
 
     fig.savefig(os.path.join(dir, "directional_s2.png"), bbox_extra_artists=None, bbox_inches='tight', dpi=72)
+
+
+def plot_images(dir, imgs, z=100):
+    plt.ioff()
+    fig, ax = plt.subplots(2, 5, figsize=(10, 10))
+
+    for i in range(0, 5):
+        img = ax[0, i].imshow(imgs[i][:, :, z], interpolation='nearest', cmap="Greys")
+
+    for i in range(5, 10):
+        img = ax[1, i - 5].imshow(imgs[i][:, :, z], interpolation='nearest', cmap="Greys")
+
+    for a in ax.flatten():
+        a.set_xticklabels([])
+        a.set_yticklabels([])
+        a.set_aspect('equal')
+        a.set_xticks([])
+        a.set_yticks([])
+
+    plt.subplots_adjust(wspace=0.05, hspace=0.05)
+
+    plt.axis('off')
+
+    fig.savefig(os.path.join(dir, "berea_comparison.png"), bbox_inches='tight', dpi=300)
