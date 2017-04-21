@@ -66,13 +66,14 @@ def plot_s2(dir, filename, cov, logging):
     logging.debug('got orig')
     radial_averages, radial_std, directional_averages, directional_std = process_s2_data(cov)
     logging.debug('got s2')
-    plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig)
+    plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig, logging)
     logging.debug('plot directional')
     plot_directional_s2(dir, directional_averages, directional_std, directional_averages_orig)
     logging.debug('plot directional')
 
-def plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig):
+def plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig, logging):
     plt.ioff()
+    logging.debug('turned off')
     fig, ax = plt.subplots(1, 1, figsize=(12, 12))
     porosity_avg = radial_averages[0]
     porosity_avg_orig = radial_averages_orig[0]
@@ -98,9 +99,9 @@ def plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_or
 
     ax.grid()
     ax.legend(fontsize=32)
-
+    logging.debug('plotted')
     fig.savefig(os.path.join(dir, "radial_averaged_s2.png"), bbox_extra_artists=None, bbox_inches='tight', dpi=72)
-
+    logging.debug('saved')
 
 def plot_directional_s2(dir, directional_averages, directional_std, directional_averages_orig):
     plt.ioff()
