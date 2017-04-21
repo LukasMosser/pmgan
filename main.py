@@ -211,5 +211,5 @@ for epoch in range(opt.niter):
 
     # do checkpointing
     if epoch % 1 == 0:
-        torch.save(netG.state_dict(), work_dir+'netG_epoch_%d.pth' % (epoch))
-        torch.save(netD.state_dict(), work_dir+'netD_epoch_%d.pth' % (epoch))
+        torch.save(netG.state_dict(), os.path.join(work_dir, 'netG_epoch_%d.pth' % (epoch)))
+        torch.save(netD.state_dict(), os.path.join(work_dir, 'netD_epoch_%d.pth' % (epoch)))

@@ -4,6 +4,7 @@ from analysis import porosity, two_point_probability
 from store import to_json, plot_s2, plot_images
 
 import os
+import logging
 
 #@delayed
 def load(filename):
@@ -37,19 +38,23 @@ def store(sample_results, tasks, dir, orig_dir):
     plot_images(dir, imgs)
 
 def run_analysis_pipeline(dir, orig_dir):
+    logging.basicConfig(filename=os.path.join(dir, 'process.log'), level=logging.DEBUG)
+    logging.debug('Entered pipeline...')
     files = []
     for file in os.listdir(dir):
         if file.endswith(".hdf5"):
             files.append(os.path.join(dir, file))
+    logging.debug('Got file names...')
 
     post_processing_tasks = [trim, despeckle, normalize, threshold]
     analysis_tasks = [porosity, two_point_probability]
     store_tasks = [to_json, plot_images, plot_s2]
 
     loaded = [load(f) for f in files]
+    logging.debug('Loaded files...')
     processed = [process(img, post_processing_tasks) for img in loaded]
+    logging.debug('Post-processed files')
     analyzed = [analyze(img, analysis_tasks) for img in processed]
+    logging.debug('Analyzed files...')
     stored = store(analyzed, store_tasks, dir, orig_dir)
-
-    #with ProgressBar():
-    #    stored.compute()
+    logging.debug('Wrote data...')
