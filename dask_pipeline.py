@@ -3,7 +3,7 @@ from dask.diagnostics import ProgressBar
 import h5py
 from postprocessing import trim, despeckle, normalize, threshold
 from analysis import porosity, two_point_probability
-from store import to_json, plot_s2, plot_sections
+from store import to_json, plot_s2, plot_images
 
 import os
 
@@ -35,8 +35,9 @@ def analyze(img, tasks):
 def store(sample_results, tasks, dir):
     cov = [results[0][1] for results in sample_results]
     porosities = [results[0][0] for results in sample_results]
+    imgs = [results[1] for results in sample_results]
     plot_s2(dir, 'test_data/orig/orig_pph.csv', cov)
-
+    plot_images(dir, imgs)
 
 dir = 'test_data/epoch_1'
 
@@ -47,7 +48,7 @@ for file in os.listdir(dir):
 
 post_processing_tasks = [trim, despeckle, normalize, threshold]
 analysis_tasks = [porosity, two_point_probability]
-store_tasks = [to_json, plot_sections, plot_s2]
+store_tasks = [to_json, plot_images, plot_s2]
 
 loaded = [load(f) for f in files]
 processed = [process(img, post_processing_tasks) for img in loaded]
