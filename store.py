@@ -60,14 +60,16 @@ def process_s2_data(cov):
     return radial_averages, radial_std, directional_averages, directional_std
 
 
-def plot_s2(dir, filename, cov):
+def plot_s2(dir, filename, cov, logging):
+    logging.debug(filename)
     radial_averages_orig, directional_averages_orig = import_s2_orig(filename)
-
+    logging.debug('got orig')
     radial_averages, radial_std, directional_averages, directional_std = process_s2_data(cov)
-
+    logging.debug('got s2')
     plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig)
+    logging.debug('plot directional')
     plot_directional_s2(dir, directional_averages, directional_std, directional_averages_orig)
-
+    logging.debug('plot directional')
 
 def plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig):
     plt.ioff()

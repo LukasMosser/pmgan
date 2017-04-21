@@ -31,11 +31,17 @@ def analyze(img, tasks):
 
 #@delayed
 def store(sample_results, tasks, dir, orig_dir):
+    logging.debug('Entered store...')
     cov = [results[0][1] for results in sample_results]
+    logging.debug('Got cov...')
     porosities = [results[0][0] for results in sample_results]
+    logging.debug('Got por...')
     imgs = [results[1] for results in sample_results]
-    plot_s2(dir, os.path.join(orig_dir, 'orig.csv'), cov)
+    logging.debug('Got imgs...')
+    plot_s2(dir, os.path.join(orig_dir, 'orig.csv'), cov, logging)
+    logging.debug('Got plot 1...')
     plot_images(dir, imgs)
+    logging.debug('Got plot 2...')
 
 def run_analysis_pipeline(dir, orig_dir):
     logging.basicConfig(filename=os.path.join(dir, 'process.log'), level=logging.DEBUG)
