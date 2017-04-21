@@ -198,7 +198,7 @@ for epoch in range(opt.niter):
 
 
         fdir = os.path.join(work_dir, "epoch_"+str(epoch))
-
+        odir = os.path.join(work_dir, "orig")
         os.mkdir(fdir)
 
         for i in range(10):
@@ -207,7 +207,7 @@ for epoch in range(opt.niter):
             save_hdf5(fake.data, os.path.join(fdir, 'fake_samples_{0}.hdf5'.format(i)))
 
         pool = Pool(processes=1)
-        result = pool.apply_async(run_analysis_pipeline, fdir)
+        result = pool.apply_async(run_analysis_pipeline, [fdir, odir])
 
     # do checkpointing
     if epoch % 1 == 0:
