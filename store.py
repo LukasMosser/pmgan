@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -60,20 +61,16 @@ def process_s2_data(cov):
     return radial_averages, radial_std, directional_averages, directional_std
 
 
-def plot_s2(dir, filename, cov, logging):
-    logging.debug(filename)
+def plot_s2(dir, filename, cov):
+    
     radial_averages_orig, directional_averages_orig = import_s2_orig(filename)
-    logging.debug('got orig')
     radial_averages, radial_std, directional_averages, directional_std = process_s2_data(cov)
-    logging.debug('got s2')
-    plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig, logging)
-    logging.debug('plot directional')
+    plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig)
     plot_directional_s2(dir, directional_averages, directional_std, directional_averages_orig)
-    logging.debug('plot directional')
+    
+    return radial_averages_orig[0]
 
-def plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig, logging):
-    plt.ioff()
-    logging.debug('turned off')
+def plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_orig):
     fig, ax = plt.subplots(1, 1, figsize=(12, 12))
     porosity_avg = radial_averages[0]
     porosity_avg_orig = radial_averages_orig[0]
@@ -99,12 +96,10 @@ def plot_radial_averaged_s2(dir, radial_averages, radial_std, radial_averages_or
 
     ax.grid()
     ax.legend(fontsize=32)
-    logging.debug('plotted')
     fig.savefig(os.path.join(dir, "radial_averaged_s2.png"), bbox_extra_artists=None, bbox_inches='tight', dpi=72)
-    logging.debug('saved')
 
 def plot_directional_s2(dir, directional_averages, directional_std, directional_averages_orig):
-    plt.ioff()
+    #plt.ioff()
     fig, ax = plt.subplots(1, 3, figsize=(36, 12))
     fig.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.05)
     for i, (j, direc) in zip(range(0, 6, 2), enumerate([r"$x$", r"$y$", r"$z$"])):
@@ -131,7 +126,7 @@ def plot_directional_s2(dir, directional_averages, directional_std, directional_
 
 
 def plot_images(dir, imgs, z=100):
-    plt.ioff()
+    #plt.ioff()
     fig, ax = plt.subplots(2, 5, figsize=(10, 10))
 
     for i in range(0, 5):
@@ -151,4 +146,4 @@ def plot_images(dir, imgs, z=100):
 
     plt.axis('off')
 
-    fig.savefig(os.path.join(dir, "berea_comparison.png"), bbox_inches='tight', dpi=300)
+    fig.savefig(os.path.join(dir, "comparison.png"), bbox_inches='tight', dpi=300)

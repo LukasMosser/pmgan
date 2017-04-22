@@ -101,7 +101,7 @@ criterion = nn.BCELoss()
 input, noise, fixed_noise, fixed_noise_TI = None, None, None, None
 input = torch.FloatTensor(opt.batchSize, nc, opt.imageSize, opt.imageSize, opt.imageSize)
 noise = torch.FloatTensor(opt.batchSize, nz, 1, 1, 1)
-fixed_noise = torch.FloatTensor(1, nz, 7, 7, 7).normal_(0, 1)
+fixed_noise = torch.FloatTensor(1, nz, 9, 9, 9).normal_(0, 1)
 fixed_noise_TI = torch.FloatTensor(1, nz, 1, 1, 1).normal_(0, 1)
 
 label = torch.FloatTensor(opt.batchSize)
@@ -188,7 +188,8 @@ for epoch in range(opt.niter):
                  errD.data[0], errG.data[0], D_x, D_G_z1, D_G_z2))
         f.write('\n')
         f.close()
-        
+    
+    delete_var = True   
     if epoch % 1 == 0:
         fake = netG(fixed_noise)
         fake_TI = netG(fixed_noise_TI)
@@ -206,11 +207,9 @@ for epoch in range(opt.niter):
             fake = netG(fixed_noise)
             save_hdf5(fake.data, os.path.join(fdir, 'fake_samples_{0}.hdf5'.format(i)))
 
-        pool = Pool(processes=1)
-        result = pool.apply_async(run_analysis_pipeline, [fdir, odir])
-        result.get()
+        delete_var = run_analysis_pipeline(fdir, odir)
 
     # do checkpointing
-    if epoch % 1 == 0:
+    if epoch % 5 == 0 or delete_var == False:
         torch.save(netG.state_dict(), os.path.join(fdir, 'netG_epoch_%d.pth' % (epoch)))
         torch.save(netD.state_dict(), os.path.join(fdir, 'netD_epoch_%d.pth' % (epoch)))

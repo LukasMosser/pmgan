@@ -6,6 +6,8 @@ from store import to_json, plot_s2, plot_images
 import os
 import logging
 
+import numpy as np
+
 #@delayed
 def load(filename):
     img = None
@@ -31,17 +33,16 @@ def analyze(img, tasks):
 
 #@delayed
 def store(sample_results, tasks, dir, orig_dir):
-    logging.debug('Entered store...')
     cov = [results[0][1] for results in sample_results]
-    logging.debug('Got cov...')
     porosities = [results[0][0] for results in sample_results]
-    logging.debug('Got por...')
     imgs = [results[1] for results in sample_results]
-    logging.debug('Got imgs...')
-    plot_s2(dir, os.path.join(orig_dir, 'orig.csv'), cov, logging)
-    logging.debug('Got plot 1...')
+    orig_por = plot_s2(dir, os.path.join(orig_dir, 'orig.csv'), cov)
     plot_images(dir, imgs)
-    logging.debug('Got plot 2...')
+    avg_por = np.mean(porosities)
+    if 0.95*orig_por < avg_por < 1.05*orig_por:
+        return False
+    else:
+        return True
 
 def run_analysis_pipeline(dir, orig_dir):
     logging.basicConfig(filename=os.path.join(dir, 'process.log'), level=logging.DEBUG)
@@ -64,3 +65,16 @@ def run_analysis_pipeline(dir, orig_dir):
     logging.debug('Analyzed files...')
     stored = store(analyzed, store_tasks, dir, orig_dir)
     logging.debug('Wrote data...')
+
+    for f in files[1::]:
+        os.remove(f)
+    logging.debug('Wrote data...')
+    #returns true if needs to be deleted.
+	
+    del loaded
+    del processed
+    del analyzed 
+
+    return stored
+
+    
